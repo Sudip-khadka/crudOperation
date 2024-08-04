@@ -160,7 +160,7 @@ const CrudOperations = () => {
           )}
           <Buttons width="265px" title="Download .xlsx Sample" type="download" iconType="download" filePath={userDataSampleFile} />
           <Buttons title="Import .xlsx File" type="upload" iconType="upload" onClick={handleOpenDialog} />
-          <Buttons width="221px" title="Create userData" type="create" onClick={handleCreateClick} iconType="create" />
+          <Buttons width="221px" title="Add New User" type="create" onClick={handleCreateClick} iconType="create" />
           <Buttons width="221px" title="View All Profiles" type="profile" onClick={handleNavigateToProfiles} iconType="profile" />
         </OtherButtons>
       </CategoryHeader>
