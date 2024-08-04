@@ -4,6 +4,7 @@ import { FaCircleCheck } from "react-icons/fa6";
 
 const AlertContainer = styled.div`
 display: flex;
+width:500px;
 height: 32px;
 padding: 14px 24px;
 justify-content: center;

@@ -5,7 +5,7 @@ import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import Alert from './Alert';
 
-const UserFormDialog = ({ open, onClose }) => {
+const UpdateUserData = ({ open, onClose ,data}) => {
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
     defaultValues: {
       address: {
@@ -16,7 +16,8 @@ const UserFormDialog = ({ open, onClose }) => {
   const [countries, setCountries] = useState([]);
   const [profilePicture, setProfilePicture] = useState(null);
   const [profilePictureBase64, setProfilePictureBase64] = useState(null);
-const [showAlert,setShowAlert] =useState(false);
+  const [showAlert,setShowAlert]=useState(false)
+
   useEffect(() => {
     axios.get('https://restcountries.com/v3.1/all')
       .then(response => {
@@ -30,23 +31,43 @@ const [showAlert,setShowAlert] =useState(false);
         console.error('Error fetching countries:', error);
       });
   }, []);
+  useEffect(() => {
+    if (data) {
+      Object.keys(data).forEach(key => {
+        if (typeof data[key] === 'object' && data[key] !== null) {
+          Object.keys(data[key]).forEach(subKey => {
+            setValue(`${key}.${subKey}`, data[key][subKey]);
+          });
+        } else {
+          setValue(key, data[key]);
+        }
+      });
+    }
+  }, [data, setValue]);
 
-  const onSubmit = (data) => {
+  const onSubmit = (formData) => {
     const existingData = JSON.parse(localStorage.getItem('userData')) || [];
-    const newUser = {
-      ...data,
-      id: uuidv4(),
+    const userIndex = existingData.findIndex(user => user.id === data.id);
+
+    const updatedUser = {
+      ...formData,
+      id: data.id, // Keep the existing user id
       profilePicture: profilePictureBase64
     };
-    existingData.push(newUser);
+
+    if (userIndex > -1) {
+      existingData[userIndex] = updatedUser;
+    } else {
+      existingData.push(updatedUser);
+    }
+
     localStorage.setItem('userData', JSON.stringify(existingData));
     setShowAlert(true);
-setTimeout(()=>{
-setShowAlert(false)
-  onClose();
-},3000)
+    setTimeout(()=>{
+        setShowAlert(false)
+        onClose();
+    },3000)
   };
-
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file && file.type === 'image/png') {
@@ -63,9 +84,9 @@ setShowAlert(false)
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle className='text-center text-2xl font-bold'>Enter Your <span className='text-blue-500'>Data</span></DialogTitle>
+      <DialogTitle className='text-center text-2xl font-bold'>Update Your <span className='text-blue-500'>Data</span></DialogTitle>
       <DialogContent>
-      {showAlert && <div className='p-[30px] w-full flex justify-center absolute top-5'><Alert message="UserData Updated Sucessfully"/></div>}
+      {showAlert && <div className='p-[30px] w-full flex justify-center'><Alert message="UserData Updated Sucessfully"/></div>}
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
           <TextField
             label="Name"
@@ -190,4 +211,4 @@ setShowAlert(false)
   );
 };
 
-export default UserFormDialog;
+export default UpdateUserData;
